@@ -96,14 +96,11 @@ def transicao(simbolo, conjunto_estados, automato):
     return list(conjunto_resultante)
 
 def conversao(alfabeto, estados, automato_AFe):
-    automato_AFN = []
-    lista_aux = []
-    dicionario_result = {}
-    k = 0
+    automato_AFN = {}
     for estado in estados:
+        dicionario_somente_transicoes = {}
         for simbolo in alfabeto:
             print("\n", estado, "lendo ", simbolo)
-            dicionario_aux = {}
             conjunto_trasicao_vazia = transicao_vazia(estado, automato_AFe)
             conjunto_resultante.clear()
             print("T-vazias1: ", conjunto_trasicao_vazia)
@@ -117,18 +114,16 @@ def conversao(alfabeto, estados, automato_AFe):
             conjunto_resultante.clear()
             print("T-vazias2: ", sorted(conjunto_result))
 
-            dicionario_aux[simbolo] = conjunto_result
-        dicionario_result[k] = (dicionario_aux)
-        k += 1
+            if(len(conjunto_result) != 0):
+                dicionario_somente_transicoes[simbolo] = sorted(conjunto_result)
 
-    # automato_AFN.append(dicionario_result)
-    print("AFN: ", dicionario_result)
+        automato_AFN[estado] = (dicionario_somente_transicoes)
+
+    print("AFN: ", automato_AFN)
     
 nomeArquivo = 'teste.txt'
 automato_AFe = organizarArray(nomeArquivo)
 print(automato_AFe)
-
-# print(automato_AFe[0][1].get('&'))
 
 alfabeto = extrair_alfabeto(automato_AFe)
 print("Alfabeto: ", alfabeto)
