@@ -1,2 +1,3 @@
+qf
 q0|a->q0|&->qf
 qf|b->qf

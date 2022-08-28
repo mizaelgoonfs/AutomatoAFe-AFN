@@ -1,0 +1,3 @@
+q0 | a->[q0, qf] | b->[qf]
+qf | b->[qf]
+Conjunto de Estados Finais: [q0, qf]

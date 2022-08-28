@@ -1,0 +1,4 @@
+q1 | a->[q1, q2, q3] | b->[q2, q3] | c->[q3]
+q2 | b->[q2, q3] | c->[q3]
+q3 | c->[q3]
+Conjunto de Estados Finais: [q1, q2, q3]

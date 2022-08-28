@@ -14,26 +14,25 @@ def organizarDict(nomeArquivo):
 
     for i in range(0, len(strLista) - 1):
         strLista[i] = strLista[i][0:-1] #retirar \n
-    #print (strLista)
+
+    # Pegando os estados finais do AFNe que vêm na primeira linha, separados por vírgula
+    estados_finais_AFNe = strLista[0].split(',')
 
     automato_AFNe = {}
 
-    for i in range(0, len(strLista)):
+    for i in range(1, len(strLista)):
         strLista[i] =  strLista[i].split('|')
-        #print (strLista)
         
         dicionario_transicoes = {}
         for j in range(1, len(strLista[i])):
             funcao_transicao = strLista[i][j].split('->')
-            #print(funcao_transicao)
             dicionario_transicoes[funcao_transicao[0]] = funcao_transicao[1].split(',')
             # Ex: (a -> Q2) Separando símbolo que aponta pros estados alcançados
             #print(strLista[i][j])
-            
-        #strLista[i][1] = dicionario_transicoes
+
         automato_AFNe[strLista[i][0]] = dicionario_transicoes
                     
-    return automato_AFNe
+    return automato_AFNe, estados_finais_AFNe
 
 def extrair_estados(automato):
     estados = []
@@ -50,9 +49,21 @@ def extrair_alfabeto(automato):
     alfabeto.remove('&')
     return sorted(alfabeto)
 
+def extrair_estados_finais(estados_finais_AFNe, automato_AFNe):
+    estados_finais_AFN = set()
+
+    for estado in automato_AFNe.keys():
+        estados_transicoes_vazias = transicao_vazia(estado, automato_AFNe)
+        for estado_atingido in estados_transicoes_vazias:
+            if(estado_atingido in estados_finais_AFNe):
+                estados_finais_AFN.add(estado)
+        #Limpando conjunto global
+        conjunto_resultante.clear()
+
+    return sorted(estados_finais_AFN)
+
 def reconhecimento(estado_inicial, automato_AFNe, estados_finais_AFNe):
     palavra =  input("Digite a palavra: ")
-    print("Palavra: ", palavra)
 
     lista_de_estados = set()
     lista_de_estados.add(estado_inicial)
@@ -80,11 +91,11 @@ def reconhecimento(estado_inicial, automato_AFNe, estados_finais_AFNe):
     
     for est in lista_de_estados:
         if(est in estados_finais_AFNe):
-            return "ACEITA!"
-    return "REJEITA!"    
+            return "PALAVRA ACEITA!\n"
+    return "PALAVRA REJEITADA!\n"
 
-conjunto_resultante = set() 
 # Conjunto resultante da transição vazia de cada estado, em recursão
+conjunto_resultante = set() 
 
 def transicao_vazia(estado_atual, automato):
     conjunto_resultante.add(estado_atual)
@@ -142,22 +153,22 @@ def conversao(alfabeto, estados, automato_AFNe):
 
     return automato_AFN
 
-def extrair_estados_finais(estados_finais_AFNe, automato_AFNe):
-    estados_finais_AFN = set()
+def gerar_arquivo_AFN(nomeArquivo, automato_AFN, estados_finais_AFN):
+    arquivo = open(nomeArquivo.split('.')[0] + "-AFN.txt",'w')
+    for estado in automato_AFN.keys():
+        linha = estado
+        transicao = automato_AFN.get(estado).items()
+        for simbolo, estados_atingidos in transicao:
+            linha = linha + ' | ' + simbolo + "->" + str(estados_atingidos).replace('\'', '')
+        arquivo.write(linha + '\n')
+    arquivo.write("Conjunto de Estados Finais: " + str(estados_finais_AFN).replace('\'', ''))
 
-    for estado in automato_AFNe.keys():
-        estados_transicoes_vazias = transicao_vazia(estado, automato_AFNe)
-        for estado_atingido in estados_transicoes_vazias:
-            if(estado_atingido in estados_finais_AFNe):
-                estados_finais_AFN.add(estado)
-        #Limpando conjunto global
-        conjunto_resultante.clear()
-
-    return sorted(estados_finais_AFN)
+    arquivo.close()
     
-nomeArquivo = 'teste.txt'
-automato_AFNe = organizarDict(nomeArquivo)
+nomeArquivo = input("Digite o nome do arquivo: ")
+(automato_AFNe, estados_finais_AFNe) = organizarDict(nomeArquivo)
 print("\nAFNe: ", automato_AFNe)
+print("Estados finais do AFNe: ", estados_finais_AFNe)
 
 alfabeto = extrair_alfabeto(automato_AFNe)
 print("Alfabeto: ", alfabeto)
@@ -165,17 +176,15 @@ print("Alfabeto: ", alfabeto)
 estados = extrair_estados(automato_AFNe)
 print("Estados: ", estados)
 
- #selecionando estados finais
-estados_finais_AFNe =  input("Escolha os estados finais [qx,qy]: \n").split(',')
-print("Estados finais do AFNe: ", estados_finais_AFNe)
-
-# estado_inicial = estados[0]
-# reconhecimento = reconhecimento(estado_inicial, automato_AFNe, estados_finais_AFNe)
-# print(reconhecimento)
-
 automato_AFN = conversao(alfabeto, estados, automato_AFNe)
 print("\nAFN: ", automato_AFN)
 
 #extraindo estados finais da conversão
 estados_finais_AFN = extrair_estados_finais(estados_finais_AFNe, automato_AFNe)
-print("Estados finais do AFN: ", estados_finais_AFN)
+print("Estados finais do AFN: ", estados_finais_AFN, "\n")
+
+gerar_arquivo_AFN(nomeArquivo, automato_AFN, estados_finais_AFN)
+
+estado_inicial = estados[0]
+reconhecimento = reconhecimento(estado_inicial, automato_AFNe, estados_finais_AFNe)
+print(reconhecimento)
