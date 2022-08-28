@@ -1,4 +1,5 @@
-#   & - movimento vazio
+# Conjunto resultante da transição vazia de cada estado, em recursão
+conjunto_resultante = set() 
 
 def LerArquivo(nomeArquivo):
     try:
@@ -93,9 +94,6 @@ def reconhecimento(estado_inicial, automato_AFNe, estados_finais_AFNe):
         if(est in estados_finais_AFNe):
             return "PALAVRA ACEITA!\n"
     return "PALAVRA REJEITADA!\n"
-
-# Conjunto resultante da transição vazia de cada estado, em recursão
-conjunto_resultante = set() 
 
 def transicao_vazia(estado_atual, automato):
     conjunto_resultante.add(estado_atual)
